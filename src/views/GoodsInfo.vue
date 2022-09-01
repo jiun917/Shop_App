@@ -18,7 +18,7 @@
                 </div>
                 <div class="goods_right">
                     <div class="goods_name">{{item.g_name}}</div>
-                    <div class="goods_introduce ellipsis">{{item.g_description}}</div>
+                    <div class="goods_introduce ">{{item.g_description}}</div>
                     <div class="goods_price">${{item.g_price}}</div>
                 </div>
                 <span class="material-icons edit" @click="modify_goods(index)">
@@ -26,15 +26,18 @@
                 </span>
             </div>
             <div class="goods">
-                <span class="material-icons goods_add">
-                    add_circle_outline
-                </span>
+                <router-link to="/AddGoods">
+                    <span class="material-icons goods_add">
+                        add_circle_outline
+                    </span>
+                </router-link>
             </div>
         </div>
     </div>
   </div>
   <goods-detail
     :isModifyGoods="isModifyGoods"
+    :goods_num="goods_num"
     :goods_name="goods_name"
     :goods_price="goods_price"
     :goods_description="goods_description"
@@ -52,6 +55,7 @@ export default {
         return{
             isModifyGoods: false,
             goodslist: [],
+            goods_num: '',
             goods_name: '',
             goods_price: '',
             goods_description: ''
@@ -67,14 +71,19 @@ export default {
     },
     methods:{
         modify_goods(index){
+            this.goods_num = this.goodslist[index].g_num
             this.goods_name = this.goodslist[index].g_name
             this.goods_price = this.goodslist[index].g_price
             this.goods_description = this.goodslist[index].g_description
             this.isModifyGoods = true
         },
         backpage(isback) {
+            axios.get('/api/shop_goods_list.php')
+            .then(res => {
+                this.goodslist = res.data
+            })
             this.isModifyGoods = isback
-        }
+        },
     },
     components: {
         GoodsDetail
@@ -153,6 +162,7 @@ export default {
                         display: flex
                         justify-content: center
                         align-items: center
+                        flex-shrink: 0
                     .goods_right
                         display: flex
                         flex-direction: column

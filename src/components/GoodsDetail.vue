@@ -16,18 +16,24 @@
             <div class="goods_name">*商品名稱</div>
             <input  type="text" v-model="goodsname" ref="refgoodsname" class="input" >
             <div class="goods_introduce">*商品描述</div>
-            <input type="text" v-model="goodsprice" class="input">
-            <div class="goods_price">*價格</div>
             <input type="text" v-model="goodsdescription" class="input">
+            <div class="goods_price">*價格</div>
+            <input type="text" v-model="goodsprice" class="input">
         </div>
-        <div class="renew_button" @click="backpage">
-            確認修改
+        <div class="button">
+            <div class="renew_button" @click="alter">
+                確認修改
+            </div>
+            <div class="delete_goods_button" @click="delete_goods">
+                移除商品
+            </div>
         </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     name:'GoodsDetail',
     data(){
@@ -41,7 +47,8 @@ export default {
         isModifyGoods: Boolean,
         goods_name: String,
         goods_price: String,
-        goods_description: String
+        goods_description: String,
+        goods_num:String
     },
     watch:{
         goods_name(val) {
@@ -55,6 +62,39 @@ export default {
         }
     },
     methods:{
+        alter(){
+            axios.get('/api/shop_alter_goods.php',{
+            params: {
+                g_num:this.goods_num,
+                new_g_name: this.goodsname,
+                new_g_description: this.goodsdescription,
+                new_g_price: this.goodsprice
+            }
+            })
+            .then(res => {
+                if(res.data.err_msg=='資料表名稱不可為空'){
+                    alert("資料表不可為空")
+                }
+                else{
+                    this.$emit("backpage",false)
+                }
+            })
+        },
+        delete_goods(){
+            axios.get('/api/shop_delete_goods.php',{
+            params: {
+                g_num:this.goods_num
+            }
+            })
+            .then(res => {
+                if(res.data.err_msg=='系統錯誤'){
+                    alert("系統錯誤")
+                }
+                else{
+                    this.$emit("backpage",false)
+                }
+            })
+        },
         backpage(){
             this.$emit("backpage",false)
         }
@@ -121,17 +161,18 @@ export default {
                         width: 445px
                         height: 250px
                         background-color: black
-            .renew_button
-                position: relative
-                top: 50%
-                left: 50%
-                transform: translate(-50%,-50%)
-                text-align: center
-                font-size: 25px
-                font-weight: bold
-                background-color: #FFBD09
-                color: #fff
-                width: 150px
-                border-radius: 25px
+            .button
+                display: flex
+                flex-direction: row
+                justify-content: center
+                .renew_button,.delete_goods_button
+                    margin-right: 20px
+                    text-align: center
+                    font-size: 25px
+                    font-weight: bold
+                    background-color: #FFBD09
+                    color: #fff
+                    width: 150px
+                    border-radius: 25px
 
 </style>
