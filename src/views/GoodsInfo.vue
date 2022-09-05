@@ -127,7 +127,7 @@ export default {
         .goodslist_div
             border-radius: 30px
             background-color: #F5F5F5
-            padding-bottom: 500px
+            padding-bottom: 100px
             margin-top: 20px
             .goodslist
                 padding: 30px
@@ -138,6 +138,7 @@ export default {
                     position: relative
                     height:140px
                     width:350px
+                    border: solid 1px #FFBD0980
                     background-color: #fff
                     border-radius: 10px
                     margin:10px
