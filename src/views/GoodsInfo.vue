@@ -65,7 +65,6 @@ export default {
       axios.get('/api/shop_goods_list.php')
         .then(res => {
           this.goodslist = res.data
-          console.log(this.goodslist)
         })
       
     },
@@ -97,7 +96,7 @@ export default {
         top:0
         left:0
         padding-bottom: 800px
-        background-color: #FFBD0980
+        background-color: #FFD40080
         font-size: 25px
         .goodsInfo
             padding-top: 25px
@@ -109,6 +108,7 @@ export default {
                 left: 0       
                 right: 0
                 margin: auto
+                font-weight: bold
             .back
                 position: relative
                 left: 5px

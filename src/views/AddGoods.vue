@@ -73,8 +73,9 @@ export default {
         top:0
         left:0
         padding-bottom: 800px
-        background-color: #FFBD0980
+        background-color: #FFD40080
         font-size: 25px
+        font-weight: bold
         .goods_detail
             padding-top: 25px
             display: flex

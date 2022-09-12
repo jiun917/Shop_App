@@ -8,7 +8,7 @@
                 </span>
             </div>
         </router-link>
-        <div class="title">修改商品資料</div>
+        <div class="title">訂單</div>
     </div>
     <div class="list_div">
         <div class="order_state">
@@ -92,7 +92,7 @@ export default {
             alert: false,
             disable_other:false,
             option_other:'',
-            rejection_reason:null,
+            rejection_reason:'material_supply',
             options: [
                 { label: '原料供應不足', value: 'material_supply', color:'warning' },
                 { label: '訂單目前數量無法負荷', value: 'order_quantity', color: 'warning' },
@@ -242,7 +242,7 @@ export default {
         top:0
         left:0
         padding-bottom: 800px
-        background-color: #FFBD0980
+        background-color: #FFD40080
         font-size: 25px
         .order_list
             padding-top: 25px
@@ -254,6 +254,7 @@ export default {
                 left: 0       
                 right: 0
                 margin: auto
+                font-weight: bold
             .back
                 position: relative
                 left: 5px
@@ -288,12 +289,14 @@ export default {
                     border-radius: 15px
                     margin-right: 50px
                     text-align: center
+                    font-weight: bold
                 .select
                     background-color: #FFBD09
                 .notification
                     font-size: 15px
                     padding: 5px
             .order_list
+                background-color: #fff
                 margin-top: 30px
                 padding: 30px
                 padding-right: 50px
@@ -327,6 +330,7 @@ export default {
                         display: flex
                         flex-direction: row
                         font-size: 18px
+                        color: #707070
                         .goods_quantity   
                             margin-right: 20px
                         .goods_price

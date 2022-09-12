@@ -31,10 +31,12 @@ export default {
     top:0
     left:0
     padding-bottom: 800px
-    background-color: #FFBD0980
+    background-color: #FFD40080
     .header
+      padding-top: 25px
       font-size: 40px
       text-align: center
+      font-weight: bold
     .list_div
       border-radius: 30px
       background-color: #F5F5F5
@@ -43,6 +45,7 @@ export default {
       display: flex 
       flex-direction: column
       align-items: center
+      font-weight: bold
       .list 
         margin-top: 50px
         .goodsInfo,.order
