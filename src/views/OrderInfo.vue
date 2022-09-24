@@ -2,7 +2,7 @@
   <div class="orderInfo">
     <div class="order_list">
         <router-link to="/">
-            <div class="back">
+            <div class="back" @click="back">
                 <span class="material-icons back_arrow">
                     navigate_before
                 </span>
@@ -12,7 +12,7 @@
     </div>
     <div class="list_div">
         <div class="order_state">
-            <q-btn  class="not_accept" :class="{select: not_accept_state}" @click="changestate('未接單')">
+            <q-btn  class="not_accept" :class="{select: not_accept_state}" @click="changestate('未接單'),data()">
                 未接單
                 <q-badge color="red" floating class="notification" v-show="not_accept_quantity>0">{{not_accept_quantity}}</q-badge>
             </q-btn>
@@ -39,12 +39,22 @@
                     <div class="goods_name">{{item.g_name}}</div>
                     <div class="goods_price">${{item.g_price*item.g_quantity}}</div>
                 </div>
+                <q-separator style="margin:10px 0px"  />
+                <div class="discount">
+                    <div class="string">折扣金額</div>
+                    <div class="number">-${{item.o_discount}}</div>
+                </div>
+                <div class="total">
+                    <div class="string">總額</div>
+                    <div class="price">${{item.total-item.o_discount}}</div>
+                </div>
             </div>
             <div class="order_button">
                 <div class="accept_order" @click="click_accept_btn(item.o_num)" v-show="state=='未接單'">接受</div>
                 <div class="reject_order" @click="click_reject_btn(item.o_num)" v-show="state=='未接單'">拒絕</div>
                 <div class="available_order" @click="click_available_btn(item.o_num)" v-show="state=='已接單'">可取餐</div>
                 <div class="cancel_order" @click="click_cancel_btn(item.o_num)" v-show="state=='已接單'">取消訂單</div>
+                <div class="finish_order" @click="click_finish_btn(item.o_num)" v-show="state=='可取餐'">完成訂單</div>
             </div>
         </div>
     </div>
@@ -75,12 +85,15 @@
 
 <script>
 import axios from 'axios'
+axios.defaults.timeout = 1000
 export default {
     name: 'OrderInfo',
     data(){
         return{
+            shop_num: '',
             order_list: [],
             order_content: [],
+            data_change: false,
             order_num:'',
             state: '未接單',
             not_accept_state: true,
@@ -102,17 +115,33 @@ export default {
         }
     },
     methods:{
-        async getA(){
-            await axios.get('/api/shop_order_list.php')
+        async get_orderlist(){
+            await axios.get('/api/shop_order_list.php',{
+                params:{
+                    shop_num:this.shop_num
+                }
+            })
             .then(res => {
-                this.order_list = res.data
+                if(res.data.length != this.order_list.length || this.data_change){
+                    console.log('aaa')
+                    this.data_change = true
+                    this.order_list = res.data
+                }
             })
             
         },
-        async getB(){
-            await axios.get('/api/shop_order_content.php')
+        async get_order_content(){
+            await axios.get('/api/shop_order_content.php',{
+                params:{
+                    shop_num:this.shop_num
+                }
+            })
             .then(res => {
-                this.order_content = res.data
+                if(this.data_change){
+                    this.data_change = false
+                    console.log('bbb')
+                    this.order_content = res.data
+                }
             })
         },
         changestate(state){
@@ -145,15 +174,18 @@ export default {
                     console.log("送出")
                 }
             })
+            this.data_change = true
         },
         click_reject_btn(num){
             this.alert = true
             this.order_num = num
+            this.data_change = true
         },
         confirm_reject(){
             axios.get('/api/shop_reject_order.php',{
             params: {
-                o_num:this.order_num
+                o_num:this.order_num,
+                o_state: this.state
             }
             })
             .then(res => {
@@ -165,6 +197,7 @@ export default {
                     console.log("送出")
                 }
             })
+            this.data_change = true
         },
         click_available_btn(num){
             axios.get('/api/shop_available_order.php',{
@@ -181,9 +214,15 @@ export default {
                     console.log("送出")
                 }
             })
+            this.data_change = true
         },
         click_cancel_btn(num){
-            axios.get('/api/shop_cancel_order.php',{
+            this.alert = true
+            this.order_num = num
+            this.data_change = true
+        },
+        click_finish_btn(num){
+            axios.get('/api/shop_finish_order.php',{
             params: {
                 o_num:num
             }
@@ -197,8 +236,45 @@ export default {
                     console.log("送出")
                 }
             })
-        }
-        
+            this.data_change = true
+        },
+        back(){
+            this.cleanTimeOut()
+        },
+        setTimeoutFun(){
+            this.timeOutRefresh = window.setInterval(() => {
+                this.data()
+            },1000)
+        },
+        cleanTimeOut(){
+            window.clearInterval(this.timeOutRefresh)
+        },
+        async data(){
+            await this.get_orderlist()
+            if(this.data_change){
+                await this.get_order_content()
+                for(var i=0;i<=this.order_list.length-1;i++){
+                    Object.assign(this.order_list[i],{goods:[],total:0}) 
+                    for(var j=0;j<=this.order_content.length-1;j++){
+                        if(this.order_list[i].o_num==this.order_content[j].o_num){
+                            this.order_list[i].goods.push(this.order_content[j])
+                            this.order_list[i].total = this.order_list[i].total+this.order_content[j].g_price*this.order_content[j].g_quantity
+                        }
+                    }
+                }
+                    this.not_accept_quantity = 0
+                    this.accepted_quantity = 0
+                    this.available_quantity = 0
+                    for(var k=0;k<=this.order_list.length-1;k++){
+                        if(this.order_list[k].o_state=='未接單')
+                            this.not_accept_quantity++
+                        else if(this.order_list[k].o_state=='已接單')
+                            this.accepted_quantity++
+                        else if(this.order_list[k].o_state=='可取餐')
+                            this.available_quantity++
+                    }
+                }
+            }
     },
     watch:{
         rejection_reason(value){
@@ -209,19 +285,20 @@ export default {
         }
     },
     async mounted(){
-
-        await this.getA()
-        await this.getB()
-
+        this.shop_num = localStorage.getItem('token')
+        await this.get_orderlist()
+        await this.get_order_content()
+        await this.setTimeoutFun()
         for(var i=0;i<=this.order_list.length-1;i++){
-            Object.assign(this.order_list[i],{goods:[]})
+            Object.assign(this.order_list[i],{goods:[],total:0})
             for(var j=0;j<=this.order_content.length-1;j++){
                 if(this.order_list[i].o_num==this.order_content[j].o_num){
                     this.order_list[i].goods.push(this.order_content[j])
+                    this.order_list[i].total = this.order_list[i].total+this.order_content[j].g_price*this.order_content[j].g_quantity
                 }
             }
         }
-
+        console.log(this.order_list)
         for(var k=0;k<=this.order_list.length-1;k++){
             if(this.order_list[k].o_state=='未接單')
                 this.not_accept_quantity++
@@ -324,7 +401,7 @@ export default {
                 .goods_list
                     display: flex
                     flex-direction: column
-                    .goods_content
+                    .goods_content,.discount,.total
                         position: relative
                         margin-left: 30px
                         display: flex
@@ -337,12 +414,22 @@ export default {
                             position: absolute
                             right: 0
                             color: #FFBD09
+                    .discount,.total
+                        color: black
+                        .number
+                            position: absolute
+                            right: 0
+                            color: #FFBD09
+                        .price
+                            position: absolute
+                            right: 0
+                            color: #FFBD09
                 .order_button
                     display: flex
                     flex-direction: row
                     font-size: 20px
                     justify-content: center
-                    .accept_order,.reject_order,.available_order,.cancel_order
+                    .accept_order,.reject_order,.available_order,.cancel_order,.finish_order
                         width: 120px
                         background-color: #FFBD09
                         color: #fff
