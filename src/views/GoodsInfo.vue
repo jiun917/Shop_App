@@ -14,7 +14,7 @@
         <div class="goodslist">
             <div class="goods" v-for="(item,index) in goodslist" :key="index">
                 <div class="goods_left">
-                    <div class="goods_picture">商品圖片</div>
+                    <img class="goods_img" :src="'http://localhost:8080/api/Img/goods/' + item.g_pic + '.jpg'">
                 </div>
                 <div class="goods_right">
                     <div class="goods_name">{{item.g_name}}</div>
@@ -41,6 +41,7 @@
     :goods_name="goods_name"
     :goods_price="goods_price"
     :goods_description="goods_description"
+    :goods_picture="goods_picture"
     @backpage="backpage"
   >
   </goods-detail>
@@ -58,11 +59,19 @@ export default {
             goods_num: '',
             goods_name: '',
             goods_price: '',
-            goods_description: ''
+            goods_description: '',
+            goods_picture:'',
+            s_num:''
         }
     },
     mounted(){
-      axios.get('/api/shop_goods_list.php')
+      this.s_num = localStorage.getItem('token')
+      console.log(this.s_num)
+      axios.get('/api/shop_goods_list.php',{
+        params:{
+            s_num : this.s_num
+        }
+      })
         .then(res => {
           this.goodslist = res.data
         })
@@ -74,10 +83,16 @@ export default {
             this.goods_name = this.goodslist[index].g_name
             this.goods_price = this.goodslist[index].g_price
             this.goods_description = this.goodslist[index].g_description
+            this.goods_picture = this.goodslist[index].g_pic
             this.isModifyGoods = true
+            
         },
         backpage(isback) {
-            axios.get('/api/shop_goods_list.php')
+            axios.get('/api/shop_goods_list.php',{
+            params:{
+                s_num : this.s_num
+            }
+             })
             .then(res => {
                 this.goodslist = res.data
             })
@@ -164,6 +179,11 @@ export default {
                         justify-content: center
                         align-items: center
                         flex-shrink: 0
+                        overflow: hidden
+                        .goods_img
+                            width: 95px
+                            height: 95px
+                            border-radius: 50%
                     .goods_right
                         display: flex
                         flex-direction: column

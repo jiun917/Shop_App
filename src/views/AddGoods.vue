@@ -37,7 +37,7 @@ export default {
     name:'AddGoods',
     data(){
         return {
-            shop_num: 1,
+            shop_num: '',
             goodsname: '',
             goodsprice: '',
             goodsdescription: ''
@@ -45,6 +45,7 @@ export default {
     },
     methods:{
         add_goods(){
+            this.shop_num = localStorage.getItem('token')
             axios.get('/api/shop_add_goods.php',{
             params: {
                 s_num:this.shop_num,

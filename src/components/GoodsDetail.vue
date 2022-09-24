@@ -11,7 +11,9 @@
     <div class="goods_div">
         <div class="goods">
             <div class="goods_picture">
-                <div class="pic"></div>
+                <div class="pic">
+                    <img class="goods_img" :src="'http://localhost:8080/api/Img/goods/' + goods_picture + '.jpg'">
+                </div>
             </div>
             <div class="goods_name">*商品名稱</div>
             <input  type="text" v-model="goodsname" ref="refgoodsname" class="input" >
@@ -48,7 +50,8 @@ export default {
         goods_name: String,
         goods_price: String,
         goods_description: String,
-        goods_num:String
+        goods_num:String,
+        goods_picture: String
     },
     watch:{
         goods_name(val) {
@@ -160,7 +163,10 @@ export default {
                     .pic
                         width: 445px
                         height: 250px
-                        background-color: black
+                        .goods_img 
+                            width: 445px
+                            height: 250px
+
             .button
                 display: flex
                 flex-direction: row
