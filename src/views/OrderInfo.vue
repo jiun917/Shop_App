@@ -30,8 +30,24 @@
             <div class="order_title">
                 <div class="user_name">{{item.name}}</div>
                 <div class="order_number">訂單編號:{{item.o_num}}</div>
+                <div class="q-mt-lg items-right"  v-show="state=='已接單'" style="margin-top:0px">
+                    <q-fab
+                        v-model="time"
+                        label="延長取餐時間"
+                        vertical-actions-align="left"
+                        color="warning"
+                        padding="none xl"
+                        icon="keyboard_arrow_down"
+                        direction="down"
+                    >
+                        <q-fab-action padding="3px" external-label color="orange" @click="add_time5(item.o_num,index)" icon="alarm" label="+5分鐘"></q-fab-action>
+                        <q-fab-action padding="3px" external-label color="orange" @click="add_time10(item.o_num,index)" icon="alarm" label="+10分鐘"></q-fab-action>
+                        <q-fab-action padding="3px" external-label color="orange" @click="add_time15(item.o_num,index)" icon="alarm" label="+15分鐘"></q-fab-action>
+                    </q-fab>
+                </div>
             </div>
             <div class="order_datetime">訂單生成時間:{{item.o_datetime}}</div>
+            <div class="order_finishtime">預計完成時間:{{item.o_finishtime}}</div>
             <div class="order_content">訂單內容</div>
             <div class="goods_list" v-show="item.o_num">
                 <div class="goods_content" v-for="(item,index) in item.goods" :key="index">
@@ -93,7 +109,9 @@ export default {
             shop_num: '',
             order_list: [],
             order_content: [],
+            order:[],
             data_change: false,
+            time: false,
             order_num:'',
             state: '未接單',
             not_accept_state: true,
@@ -122,10 +140,10 @@ export default {
                 }
             })
             .then(res => {
-                if(res.data.length != this.order_list.length || this.data_change){
+                if(this.data_change || this.order_list.length != res.data.length){
                     console.log('aaa')
-                    this.data_change = true
                     this.order_list = res.data
+                    this.data_change = false
                 }
             })
             
@@ -137,10 +155,24 @@ export default {
                 }
             })
             .then(res => {
-                if(this.data_change){
-                    this.data_change = false
+                if(this.data_change || this.order_content.length != res.data.length){
                     console.log('bbb')
                     this.order_content = res.data
+                    this.data_change = false
+                }
+            })
+        },
+        async order_change(){
+            await axios.get('/api/shop_comment_length.php',{
+                params:{
+                    shop_num:this.shop_num
+                }
+            })
+            .then(res => {
+                if( res.data.length != this.order.length){
+                    console.log('ccc')
+                    this.order = res.data
+                    this.data_change = true
                 }
             })
         },
@@ -167,6 +199,7 @@ export default {
             })
             .then(res => {
                 console.log(res.data)
+                this.data_change = true
                 if(res.data.err_msg=='系統錯誤'){
                     alert("系統錯誤")
                 }
@@ -174,7 +207,6 @@ export default {
                     console.log("送出")
                 }
             })
-            this.data_change = true
         },
         click_reject_btn(num){
             this.alert = true
@@ -190,6 +222,7 @@ export default {
             })
             .then(res => {
                 console.log(res.data)
+                this.data_change = true
                 if(res.data.err_msg=='系統錯誤'){
                     alert("系統錯誤")
                 }
@@ -197,7 +230,6 @@ export default {
                     console.log("送出")
                 }
             })
-            this.data_change = true
         },
         click_available_btn(num){
             axios.get('/api/shop_available_order.php',{
@@ -207,6 +239,7 @@ export default {
             })
             .then(res => {
                 console.log(res.data)
+                this.data_change = true
                 if(res.data.err_msg=='系統錯誤'){
                     alert("系統錯誤")
                 }
@@ -214,21 +247,22 @@ export default {
                     console.log("送出")
                 }
             })
-            this.data_change = true
+            
         },
         click_cancel_btn(num){
             this.alert = true
             this.order_num = num
             this.data_change = true
         },
-        click_finish_btn(num){
-            axios.get('/api/shop_finish_order.php',{
+        async click_finish_btn(num){
+            await axios.get('/api/shop_finish_order.php',{
             params: {
                 o_num:num
             }
             })
             .then(res => {
                 console.log(res.data)
+                this.data_change = true
                 if(res.data.err_msg=='系統錯誤'){
                     alert("系統錯誤")
                 }
@@ -236,7 +270,7 @@ export default {
                     console.log("送出")
                 }
             })
-            this.data_change = true
+            
         },
         back(){
             this.cleanTimeOut()
@@ -250,8 +284,10 @@ export default {
             window.clearInterval(this.timeOutRefresh)
         },
         async data(){
-            await this.get_orderlist()
+            await this.order_change()
+            
             if(this.data_change){
+                await this.get_orderlist()
                 await this.get_order_content()
                 for(var i=0;i<=this.order_list.length-1;i++){
                     Object.assign(this.order_list[i],{goods:[],total:0}) 
@@ -262,6 +298,7 @@ export default {
                         }
                     }
                 }
+                    
                     this.not_accept_quantity = 0
                     this.accepted_quantity = 0
                     this.available_quantity = 0
@@ -273,8 +310,47 @@ export default {
                         else if(this.order_list[k].o_state=='可取餐')
                             this.available_quantity++
                     }
-                }
             }
+        },
+        async add_time5(num,index){
+            console.log(num)
+            this.time = false
+            await axios.get('/api/shop_order_delay5.php',{
+            params: {
+                o_num:num
+            }
+            })
+            .then(res => {
+                this.order_list[index].o_finishtime = res.data.time 
+                
+            })
+        },
+        async add_time10(num,index){
+            console.log(num)
+            this.time = false
+            await axios.get('/api/shop_order_delay10.php',{
+            params: {
+                o_num:num
+            }
+            })
+            .then(res => {
+                this.order_list[index].o_finishtime = res.data.time 
+                
+            })
+        },
+        async add_time15(num,index){
+            console.log(num)
+            this.time = false
+            await axios.get('/api/shop_order_delay15.php',{
+            params: {
+                o_num:num
+            }
+            })
+            .then(res => {
+                this.order_list[index].o_finishtime = res.data.time 
+                
+            })
+        }
     },
     watch:{
         rejection_reason(value){
@@ -307,8 +383,6 @@ export default {
             else if(this.order_list[k].o_state=='可取餐')
                 this.available_quantity++
         }
-        
-        
     }
 }
 </script>
@@ -350,11 +424,12 @@ export default {
         .list_div
             border-radius: 30px
             background-color: #F5F5F5
-            padding-bottom: 100px
+            padding-bottom: 200px
             margin-top: 20px
             display: flex 
             flex-direction: column
             align-items: center
+            height: 850px
             .order_state
                 display: flex
                 flex-direction: row
@@ -384,16 +459,18 @@ export default {
                 flex-direction: column
                 font-weight: bold
                 .order_title
+                    position: relative
                     display: flex
                     flex-direction: row
+                    justify-content: space-between
                     .user_name
                         line-height: 30px
                         font-size: 30px
                         margin-right: 30px
                     .order_number
-                        line-height: 40px
                         font-size: 18px
-                .order_datetime
+                       
+                .order_datetime,.order_finishtime
                     font-size: 18px
                     color: #707070
                 .order_content

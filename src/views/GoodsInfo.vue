@@ -85,7 +85,8 @@ export default {
             this.goods_description = this.goodslist[index].g_description
             this.goods_picture = this.goodslist[index].g_pic
             this.isModifyGoods = true
-            
+            document.body.scrollTop = 0
+            document.documentElement.scrollTop = 0
         },
         backpage(isback) {
             axios.get('/api/shop_goods_list.php',{

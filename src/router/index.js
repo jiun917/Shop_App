@@ -43,7 +43,15 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
+  //每次跳轉頁面回到最上層
+  scrollBehavior(to,from,savedPosition) {
+    if(savedPosition) {
+      return savedPosition
+    }else{
+      return {top:0}
+    }
+  }
 })
 
 router.beforeEach((to, from, next) => {
