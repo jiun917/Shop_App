@@ -4,6 +4,7 @@ import GoodsInfo from '../views/GoodsInfo.vue'
 import OrderInfo from  '../views/OrderInfo.vue'
 import AddGoods from  '../views/AddGoods.vue'
 import LoginPage from '../views/Login.vue'
+import QrcodeReader from '../views/QrcodeReader.vue'
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/AddGoods',
     name: 'AddGoods',
     component: AddGoods
+  },
+  {
+    path: '/qrcode',
+    name: 'QrcodeReader',
+    component: QrcodeReader
   }
   // {
   //   path: '/about',

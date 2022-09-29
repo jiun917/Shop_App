@@ -71,6 +71,7 @@
                 <div class="available_order" @click="click_available_btn(item.o_num)" v-show="state=='已接單'">可取餐</div>
                 <div class="cancel_order" @click="click_cancel_btn(item.o_num)" v-show="state=='已接單'">取消訂單</div>
                 <div class="finish_order" @click="click_finish_btn(item.o_num)" v-show="state=='可取餐'">完成訂單</div>
+                <div class="finish_order" @click="click_qrcode_btn(item.o_num)" v-show="state=='可取餐'">掃描條碼</div>
             </div>
         </div>
     </div>
@@ -101,6 +102,7 @@
 
 <script>
 import axios from 'axios'
+
 axios.defaults.timeout = 1000
 export default {
     name: 'OrderInfo',
@@ -129,7 +131,7 @@ export default {
                 { label: '訂單目前數量無法負荷', value: 'order_quantity', color: 'warning' },
                 { label: '營業時間已結束', value: 'time', color: 'warning' },
                 { label: '其他', value: 'other', color: 'warning' }
-            ]
+            ],
         }
     },
     methods:{
@@ -350,7 +352,11 @@ export default {
                 this.order_list[index].o_finishtime = res.data.time 
                 
             })
-        }
+        },
+        click_qrcode_btn(num){
+            this.$router.push('/qrcode')
+            console.log(num)
+        },
     },
     watch:{
         rejection_reason(value){
