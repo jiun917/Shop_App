@@ -6,14 +6,15 @@ module.exports = defineConfig({
   devServer: {
     proxy: {
       '/api': {
-        target: 'http://localhost:80/app_database',
+        target: 'https://jiun.com/app_database',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
         },
         logLevel: 'debug'
       }
-    }
+    },
+    https: true
   },
 
   pluginOptions: {

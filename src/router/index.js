@@ -5,6 +5,8 @@ import OrderInfo from  '../views/OrderInfo.vue'
 import AddGoods from  '../views/AddGoods.vue'
 import LoginPage from '../views/Login.vue'
 import QrcodeReader from '../views/QrcodeReader.vue'
+import MapTgos from '../views/TgosMap.vue'
+
 
 const routes = [
   {
@@ -36,6 +38,11 @@ const routes = [
     path: '/qrcode',
     name: 'QrcodeReader',
     component: QrcodeReader
+  },
+  {
+    path: '/MapTgos',
+    name: 'MapTgos',
+    component: MapTgos
   }
   // {
   //   path: '/about',

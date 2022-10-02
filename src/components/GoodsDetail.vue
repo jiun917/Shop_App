@@ -12,7 +12,7 @@
         <div class="goods">
             <div class="goods_picture">
                 <div class="pic">
-                    <img class="goods_img" :src="'http://localhost:8080/api/Img/goods/' + goods_picture + '.jpg'">
+                    <img class="goods_img" :src="'/api/Img/goods/' + goods_picture + '.jpg'">
                 </div>
             </div>
             <div class="goods_name">*商品名稱</div>

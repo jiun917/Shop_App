@@ -14,6 +14,9 @@
         <router-link to="/OrderInfo" style="text-decoration: none">
           <div class="order">訂單</div>
         </router-link>
+        <router-link to="/MapTgos" style="text-decoration: none">
+          <div class="order">營業地址</div>
+        </router-link>
       </div>
       <div class="button">
         <div class="shop_open">開始營業</div>

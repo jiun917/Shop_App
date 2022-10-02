@@ -14,7 +14,7 @@
         <div class="goodslist">
             <div class="goods" v-for="(item,index) in goodslist" :key="index">
                 <div class="goods_left">
-                    <img class="goods_img" :src="'http://localhost:8080/api/Img/goods/' + item.g_pic + '.jpg'">
+                    <img class="goods_img" :src="'/api/Img/goods/' + item.g_pic + '.jpg'">
                 </div>
                 <div class="goods_right">
                     <div class="goods_name">{{item.g_name}}</div>
